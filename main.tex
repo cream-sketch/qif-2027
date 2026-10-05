@@ -1,0 +1,82 @@
+\documentclass[11pt]{article}
+
+\usepackage[letterpaper,top=0.45in,bottom=0.45in,left=0.50in,right=0.50in]{geometry}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit}
+
+\definecolor{accent}{RGB}{30,72,120}
+\definecolor{soft}{RGB}{245,247,250}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2.5pt}
+\setlist[itemize]{leftmargin=1.15em,itemsep=0.5pt,topsep=1pt}
+\pagestyle{empty}
+\titleformat{\section}{\bfseries\color{accent}\normalsize}{}{0pt}{}
+\titlespacing*{\section}{0pt}{4.5pt}{1.5pt}
+
+% ===== Edit these fields =====
+\newcommand{\projecttitle}{AgentQEC: Verifier-Grounded Multi-Agent Discovery of Efficient Quantum Error-Correcting Codes}
+\newcommand{\studentA}{Student Name 1}
+\newcommand{\studentB}{Student Name 2}
+\newcommand{\university}{North Carolina State University}
+
+\begin{document}
+
+\begin{center}
+    {\Large\bfseries \projecttitle}\\[1pt]
+    {\small \studentA\textsuperscript{1} \quad and \quad \studentB\textsuperscript{1}}\\[1pt]
+    {\small \textsuperscript{1}\,\university}
+\end{center}
+
+\vspace{-1pt}
+
+\section*{Motivation and Problem}
+
+Quantum computing offers potential computational advantages for selected problems such as quantum simulation, cryptography, and structured optimization, but these advantages are difficult to realize because quantum states are fragile. Imperfect gates, decoherence, measurement noise, and control errors accumulate throughout a computation, making \textbf{quantum error correction (QEC)} essential for scalable fault-tolerant quantum computing. A QEC code protects logical quantum information by encoding it across multiple physical qubits and using measurable error syndromes to detect and correct faults without directly measuring the protected state.
+
+Designing effective QEC codes, however, remains a difficult discovery problem. A useful code must simultaneously provide strong error suppression, low physical-qubit overhead, efficient syndrome extraction, decoder compatibility, and implementable connectivity. Traditional QEC design relies heavily on expert-derived algebraic constructions, followed by heuristic or combinatorial search within restricted code families. As design spaces grow, candidate generation becomes combinatorial while candidate evaluation requires hard algebraic validity checks and often expensive decoding and noise simulation. This motivates an AI system that can search broadly, reason over heterogeneous constraints, and learn from executable feedback.
+
+\section*{Proposed Innovation: AgentQEC}
+
+We propose \textbf{AgentQEC}, a verifier-grounded multi-agent framework for efficient QEC discovery. Instead of asking a single language model to directly invent a code, AgentQEC decomposes scientific discovery into specialized roles. A \textit{Designer Agent} proposes candidate code structures; a \textit{Theory/Verifier Agent} checks algebraic constraints and code validity; an \textit{Evaluator Agent} invokes deterministic tools to estimate code parameters, decoding behavior, and logical error performance; and a \textit{Coordinator Agent} integrates feedback and allocates search effort toward promising regions. The agents therefore reason over symbolic structure, but all critical claims are grounded by executable verification and numerical evaluation.
+
+\begin{center}
+\begin{tikzpicture}[
+    scale=0.86, transform shape,
+    node distance=4.5mm and 5.2mm,
+    box/.style={draw, rounded corners=2pt, fill=soft, inner sep=3.6pt, align=center, minimum height=0.54cm},
+    agent/.style={box, minimum width=2.05cm},
+    arrow/.style={-{Latex[length=1.7mm]}, line width=0.45pt}
+]
+\node[box, minimum width=2.05cm] (goal) {\textbf{QEC Design Goal}\\noise + hardware constraints};
+\node[agent, right=of goal] (design) {\textbf{Designer}\\candidate codes};
+\node[agent, right=of design] (verify) {\textbf{Verifier}\\validity + structure};
+\node[agent, right=of verify] (eval) {\textbf{Evaluator}\\logical error + cost};
+\node[box, right=of eval, minimum width=2.15cm] (score) {\textbf{Dual-Efficiency}\\code quality + search cost};
+
+\draw[arrow] (goal) -- (design);
+\draw[arrow] (design) -- (verify);
+\draw[arrow] (verify) -- (eval);
+\draw[arrow] (eval) -- (score);
+\draw[arrow] (score.south) |- ++(0,-0.32) -| (design.south);
+
+\node[draw=accent, rounded corners=3pt, fit=(design)(verify)(eval), inner sep=2.8pt, label={[text=accent,font=\scriptsize\bfseries]above:Verifier-grounded multi-agent discovery}] {};
+\end{tikzpicture}
+\end{center}
+
+\vspace{-2pt}
+
+\section*{Dual Efficiency: Better Codes with Less Discovery Cost}
+
+AgentQEC explicitly optimizes \textbf{two coupled notions of efficiency}. First, \textbf{QEC system efficiency} measures the quality of the discovered code: logical error rate, code distance, physical-to-logical qubit overhead, syndrome-extraction depth, decoder latency, and hardware connectivity requirements. Second, \textbf{agentic discovery efficiency} measures the cost of finding that code: wall-clock search time, number of candidate evaluations, expensive simulator/decoder calls, LLM inference tokens, and tool-use overhead. This prevents an agentic system from obtaining marginally better codes only by consuming impractical search resources. The goal is to discover a Pareto frontier of \emph{reliability and implementation cost} while minimizing \emph{AI/search cost}.
+
+\section*{One-Year Scope and Expected Impact}
+
+We will begin with stabilizer and CSS QEC codes, where candidate structures admit precise machine-checkable constraints and well-defined numerical evaluation. We will benchmark AgentQEC against human-designed code families, non-agentic heuristic/optimization search, and single-agent baselines under matched search budgets. Key experiments will measure (i) whether multi-agent specialization improves the quality and diversity of valid discovered codes, (ii) whether verifier feedback improves reliability over unconstrained language-model generation, and (iii) whether adaptive search coordination reduces discovery cost. The broader objective is to establish a general methodology for \textbf{resource-aware agentic scientific discovery}: AI systems that not only discover high-quality technical artifacts, but do so efficiently and with machine-verifiable evidence.
+
+\end{document}
