@@ -1,83 +1,88 @@
 \documentclass[11pt]{article}
 
 \usepackage[letterpaper,top=0.45in,bottom=0.45in,left=0.50in,right=0.50in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{newtxtext,newtxmath}
 \usepackage{microtype}
-\usepackage{amsmath,amssymb}
-\usepackage{enumitem}
+
 \usepackage{xcolor}
 \usepackage{titlesec}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,fit}
+\usepackage[hidelinks]{hyperref}
+\usetikzlibrary{arrows.meta,positioning,calc}
 
 \definecolor{accent}{RGB}{30,72,120}
 \definecolor{soft}{RGB}{245,247,250}
-
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{2.5pt}
-\setlist[itemize]{leftmargin=1.15em,itemsep=0.5pt,topsep=1pt}
+\AtBeginDocument{\fontsize{11}{12.8}\selectfont}
 \pagestyle{empty}
 \titleformat{\section}{\bfseries\color{accent}\normalsize}{}{0pt}{}
-\titlespacing*{\section}{0pt}{4.5pt}{1.5pt}
+\titlespacing*{\section}{0pt}{5pt}{1.5pt}
 
-% ===== Edit these fields =====
-\newcommand{\projecttitle}{AgentQEC: Learning to Coordinate Agents for Efficient Quantum Error-Correcting Code Discovery}
+% ===== Author/title fields =====
+\newcommand{\projecttitle}{AgentQEC: Learning to Coordinate Agents for Efficient\\Quantum Error-Correcting Code Discovery}
 \newcommand{\studentA}{Shubdeep Mohapatra}
 \newcommand{\studentB}{Yongxiang Lyu}
 \newcommand{\university}{North Carolina State University}
 
 \begin{document}
-
-\begin{center}
-    {\Large\bfseries \projecttitle}\\[1pt]
-    {\small Shubdeep Mohapatra\textsuperscript{1} \quad  
-Yongxiang Lyu  \textsuperscript{1}}\\[1pt]
+\begingroup\centering
+    {\Large\bfseries \projecttitle}\\[2pt]
+    {\small \studentA\textsuperscript{1}\qquad \studentB\textsuperscript{1}}\\[1pt]
     {\small \textsuperscript{1}\,\university}
-\end{center}
-
-\vspace{-1pt}
+\par\endgroup
+\vspace{2pt}
 
 \section*{Motivation and Problem}
+Quantum computing changes the scaling of selected computations: Shor's algorithm factors integers in polynomial time, whereas no polynomial-time classical algorithm is known~\cite{shor}. Unlike the reliable-gate abstraction of classical computing, physical quantum operations remain error-prone: entangling-gate infidelities near $10^{-3}$ have been reported, while many applications target logical error rates below $10^{-10}$~\cite{googleqec}. \textbf{Quantum error correction (QEC)} addresses this gap by encoding logical information across multiple physical qubits. A \emph{QEC code} specifies the encoding and error checks that reveal faults without reading out the protected quantum state.
 
-Quantum computing offers potential computational advantages for selected problems such as quantum simulation, cryptography, and structured optimization, but these advantages are difficult to realize because quantum states are fragile. Imperfect gates, decoherence, measurement noise, and control errors accumulate throughout a computation, making \textbf{quantum error correction (QEC)} essential for scalable fault-tolerant quantum computing. A QEC code protects logical quantum information by encoding it across multiple physical qubits and using measurable error syndromes to detect and correct faults without directly measuring the protected state.
+QEC discovery balances reliability, qubit overhead, and hardware constraints. Experts construct algebraic code families, while heuristic and reinforcement-learning methods explore candidate codes and encoding circuits~\cite{olle}. We ask: \textbf{how should an AI system allocate reasoning, communication, and evaluation resources as evidence about a candidate changes?} Algebraic checks can be inexpensive and exact, whereas decoding and noise simulations provide costly statistical estimates. Fixed agent workflows cannot adapt this allocation.
 
-Designing effective QEC codes, however, remains a difficult discovery problem. A useful code must simultaneously provide strong error suppression, low physical-qubit overhead, efficient syndrome extraction, decoder compatibility, and implementable connectivity. Traditional QEC design relies heavily on expert-derived algebraic constructions, followed by heuristic or combinatorial search within restricted code families. As design spaces grow, candidate generation becomes combinatorial while candidate evaluation requires hard algebraic validity checks and often expensive decoding and noise simulation. This motivates an AI system that can search broadly, reason over heterogeneous constraints, and learn from executable feedback.
+\section*{Proposed Innovation: Learning to Coordinate}
+We propose \textbf{AgentQEC}, a multi-agent system with \textbf{evidence-conditioned, budget-aware coordination}. Designer and critic agents propose and refine codes; executable mathematical checkers and numerical simulators test them. Building on cost-aware agent coordination~\cite{corl}, we will learn a controller that jointly selects the next specialist, its inference budget, and the fidelity of tool evaluation. Decisions depend on candidate structure, verification history, evaluation uncertainty, remaining budget, and measured runtime state---not a predetermined sequence of agent calls.
 
-\section*{Proposed Innovation: AgentQEC}
+\textbf{Learning from heterogeneous feedback.} We will train the controller with cost-constrained reinforcement learning on tool-annotated search trajectories, initially keeping specialist models fixed. Exact validity violations, estimated code properties, and confidence intervals on logical-error rates remain distinct in the state representation. Intermediate results guide repair and evaluation decisions; high-fidelity assessments supply the final quality signal. A failed commutation check triggers repair rather than simulation, while uncertain performance can justify additional samples. The controller must learn when stronger evidence justifies its cost, without treating cheap proxies as verified improvements.
 
-We propose \textbf{AgentQEC}, a verifier-grounded multi-agent framework for efficient QEC discovery. Instead of asking a single language model to directly invent a code, AgentQEC decomposes scientific discovery into specialized roles. A \textit{Designer Agent} proposes candidate code structures; a \textit{Theory/Verifier Agent} checks algebraic constraints and code validity; an \textit{Evaluator Agent} invokes deterministic tools to estimate code parameters, decoding behavior, and logical error performance; and a \textit{Coordinator Agent} integrates feedback and allocates search effort toward promising regions. The agents therefore reason over symbolic structure, but all critical claims are grounded by executable verification and numerical evaluation.
-
-\begin{center}
+\vspace{2pt}
+\begingroup\centering
 \begin{tikzpicture}[
-    scale=0.86, transform shape,
-    node distance=4.5mm and 5.2mm,
-    box/.style={draw, rounded corners=2pt, fill=soft, inner sep=3.6pt, align=center, minimum height=0.54cm},
-    agent/.style={box, minimum width=2.05cm},
-    arrow/.style={-{Latex[length=1.7mm]}, line width=0.45pt}
+    font=\fontsize{9}{10.2}\selectfont,
+    box/.style={draw=accent!85!black,rounded corners=2pt,fill=soft,
+        inner xsep=4pt,inner ysep=5pt,align=center,minimum height=0.70cm},
+    arrow/.style={-{Latex[length=1.6mm]},line width=0.5pt,draw=accent!85!black},
+    lab/.style={font=\fontsize{8.1}{9}\selectfont,fill=white,inner sep=1.5pt}
 ]
-\node[box, minimum width=2.05cm] (goal) {\textbf{QEC Design Goal}\\noise + hardware constraints};
-\node[agent, right=of goal] (design) {\textbf{Designer}\\candidate codes};
-\node[agent, right=of design] (verify) {\textbf{Verifier}\\validity + structure};
-\node[agent, right=of verify] (eval) {\textbf{Evaluator}\\logical error + cost};
-\node[box, right=of eval, minimum width=2.15cm] (score) {\textbf{Dual-Efficiency}\\code quality + search cost};
+\node[box,text width=3.0cm] (state) at (0,0) {\textbf{Search State}\\evidence + budget};
+\node[box,text width=3.2cm] (coord) at (4.0,0) {\textbf{Learned Coordinator}\\select / budget / stop};
+\node[box,text width=2.65cm] (agents) at (7.9,0) {\textbf{Agent Pool}\\designer / critic};
+\node[box,text width=3.1cm] (tools) at (11.85,0) {\textbf{QEC Tools}\\checks / simulations};
+\draw[arrow] (state.east) -- (coord.west);
+\draw[arrow] (coord.east) -- (agents.west);
+\draw[arrow] (agents.east) -- (tools.west);
+\draw[arrow] (coord.north) -- ++(0,0.38) -| node[pos=0.25,lab] {select tool and evaluation fidelity} (tools.north);
+\draw[arrow] (tools.south) -- ++(0,-0.38) -| node[pos=0.44,lab] {checked evidence + uncertainty + measured runtime costs} (state.south);
+\end{tikzpicture}\par\endgroup
+\vspace{1pt}
 
-\draw[arrow] (goal) -- (design);
-\draw[arrow] (design) -- (verify);
-\draw[arrow] (verify) -- (eval);
-\draw[arrow] (eval) -- (score);
-\draw[arrow] (score.south) |- ++(0,-0.32) -| (design.south);
+\section*{Agentic System Efficiency and QEC Quality}
+\textbf{Agentic system efficiency} targets avoidable inference, inter-agent communication, and synchronization overhead. The controller selectively activates specialists and budgets their context exchange. Shared structured records reuse tool results only when candidate, noise, and decoder settings match; dependency-aware scheduling overlaps independent checks and reasoning. We will measure latency, GPU time, peak memory, tokens, communication volume, and tool time, including coordination overhead; training costs will be reported separately. \textbf{QEC system efficiency} is evaluated through logical-error rate at fixed noise and decoder settings, physical-qubit overhead, syndrome-extraction depth, and decoder latency. We will compare agent cost at matched QEC quality and QEC quality at matched budgets, rather than assume simultaneous gains in both.
 
-\node[draw=accent, rounded corners=3pt, fit=(design)(verify)(eval), inner sep=2.8pt, label={[text=accent,font=\scriptsize\bfseries]above:Verifier-grounded multi-agent discovery}] {};
-\end{tikzpicture}
-\end{center}
+\section*{One-Year Scope and Evaluation}
+Year one will deliver a CSS-code prototype, learned controller, and reproducible benchmark. On held-out noise settings and code sizes, we will compare fixed, rule-based, and learned coordination using the same specialist/tool pool, alongside single-agent and heuristic/RL code-search baselines. Ablations will isolate feedback, routing, and shared-state scheduling to quantify the quality--compute tradeoff.
 
-\vspace{-2pt}
-
-\section*{Dual Efficiency: Better Codes with Less Discovery Cost}
-
-AgentQEC explicitly optimizes \textbf{two coupled notions of efficiency}. First, \textbf{QEC system efficiency} measures the quality of the discovered code: logical error rate, code distance, physical-to-logical qubit overhead, syndrome-extraction depth, decoder latency, and hardware connectivity requirements. Second, \textbf{agentic discovery efficiency} measures the cost of finding that code: wall-clock search time, number of candidate evaluations, expensive simulator/decoder calls, LLM inference tokens, and tool-use overhead. This prevents an agentic system from obtaining marginally better codes only by consuming impractical search resources. The goal is to discover a Pareto frontier of \emph{reliability and implementation cost} while minimizing \emph{AI/search cost}.
-
-\section*{One-Year Scope and Expected Impact}
-
-We will begin with stabilizer and CSS QEC codes, where candidate structures admit precise machine-checkable constraints and well-defined numerical evaluation. We will benchmark AgentQEC against human-designed code families, non-agentic heuristic/optimization search, and single-agent baselines under matched search budgets. Key experiments will measure (i) whether multi-agent specialization improves the quality and diversity of valid discovered codes, (ii) whether verifier feedback improves reliability over unconstrained language-model generation, and (iii) whether adaptive search coordination reduces discovery cost. The broader objective is to establish a general methodology for \textbf{resource-aware agentic scientific discovery}: AI systems that not only discover high-quality technical artifacts, but do so efficiently and with machine-verifiable evidence.
-
+% Compact, self-contained references: no BibTeX step or external .bib is needed.
+% These support background claims, not a claim of first-ever learned orchestration.
+\begingroup
+\renewcommand{\section}[2]{}%
+\fontsize{8.1}{9.2}\selectfont
+\setlength{\parskip}{0pt}
+\begin{thebibliography}{4}
+\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}
+\bibitem{shor} P.~W.~Shor. \href{https://arxiv.org/abs/quant-ph/9508027}{Polynomial-Time Algorithms for Prime Factorization and Discrete Logarithms on a Quantum Computer}. \emph{SIAM J. Comput.} 26, 1484--1509 (1997).
+\bibitem{googleqec} Google Quantum AI and Collaborators. \href{https://doi.org/10.1038/s41586-024-08449-y}{Quantum error correction below the surface code threshold}. \emph{Nature} 638, 920--926 (2025).
+\bibitem{olle} J.~Olle et al. \href{https://arxiv.org/abs/2311.04750}{Simultaneous discovery of quantum error correction codes and encoders with a noise-aware reinforcement learning agent}. arXiv:2311.04750 (2023).
+\bibitem{corl} B.~Jin et al. \href{https://arxiv.org/abs/2511.02755}{Controlling Performance and Budget of a Centralized Multi-agent LLM System with Reinforcement Learning}. arXiv:2511.02755 (2025).
+\end{thebibliography}
+\endgroup
 \end{document}
