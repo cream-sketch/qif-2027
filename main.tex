@@ -29,7 +29,7 @@
 \titlespacing*{\section}{0pt}{5pt}{1.5pt}
 
 % ===== Author/title fields =====
-\newcommand{\projecttitle}{AgentQEC: Learning to Coordinate Agents for Compute-Efficient\\Quantum Error Correction Code Discovery}
+\newcommand{\projecttitle}{AgentQEC: Adaptive Dual-Loop for Efficient Quantum Error Correction Code Discovery}
 \newcommand{\studentA}{Shubdeep Mohapatra}
 \newcommand{\studentB}{Yongxiang Lyu}
 \newcommand{\university}{North Carolina State University}
@@ -142,7 +142,7 @@ We propose \textbf{AgentQEC}, a multi-agent system with \textbf{evidence-conditi
 \textbf{Agentic system efficiency} targets avoidable inference, inter-agent communication, and synchronization overhead. The controller selectively activates specialists and budgets their context exchange. Shared structured records reuse tool results only when candidate, noise, and decoder settings match; dependency-aware scheduling overlaps independent checks and reasoning. We will measure latency, GPU time, peak memory, tokens, communication volume, and tool time, including coordination overhead; training costs will be reported separately. \textbf{QEC system efficiency} is evaluated through logical-error rate at fixed noise and decoder settings, physical-qubit overhead, syndrome-extraction depth, and decoder latency. We will compare agent cost at matched QEC quality and QEC quality at matched budgets, rather than assume simultaneous gains in both.
 
 \section*{One-Year Scope and Evaluation}
-Year one will deliver a CSS-code prototype, learned controller, and reproducible benchmark. On held-out noise settings and code sizes, we will compare fixed, rule-based, and learned coordination using the same specialist/tool pool, alongside single-agent and heuristic/RL code-search baselines. Ablations will isolate feedback, routing, and shared-state scheduling to quantify the quality--compute tradeoff.
+A dual-loop CSS-code discovery prototype, an adaptive screening module, and a reproducible quality–compute benchmark.
 
 % Compact, self-contained references: no BibTeX step or external .bib is needed.
 % These support background claims, not a claim of first-ever learned orchestration.
