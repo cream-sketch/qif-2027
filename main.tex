@@ -43,9 +43,9 @@
 \vspace{2pt}
 
 \section*{Motivation and Problem}
-Quantum computers can solve certain problems asymptotically faster than any known classical method: Shor's algorithm factors integers in polynomial time, whereas no polynomial-time classical algorithm is known~\cite{shor}. Unlike the reliable-gate abstraction of classical computing, physical quantum operations remain error-prone: entangling-gate infidelities near $10^{-3}$ state-of-the-art platforms have only recently reached, while many applications target logical error rates below $10^{-10}$~\cite{googleqec}. \textbf{Quantum error correction (QEC)} addresses this gap by encoding logical information across multiple physical qubits. A \emph{QEC code} encodes logical information redundantly and defines parity checks whose measurements detect errors without disturbing the encoded state.
+Shor's polynomial-time factoring algorithm illustrates quantum computing's advantage over the best known classical methods~\cite{shor}. Realizing such speedups requires reliable computation despite noisy physical operations. \textbf{Quantum error correction (QEC)} protects logical information across physical qubits; a \emph{QEC code} specifies the encoding and parity checks used to diagnose faults without reading the protected information.
 
-Discovering good codes requires trading off logical error rate, qubit overhead, and hardware constraints. Experts construct algebraic code families, while heuristic and reinforcement-learning methods explore candidate codes and encoding circuits~\cite{olle}. We ask: \textbf{how should an AI system allocate reasoning, communication, and evaluation resources as evidence about a candidate changes?} Algebraic checks are expensive and exact, distance computation is exact but expensive and circuit-level noise simulation yield costly statistical estimate. Fixed agent workflows cannot adapt this allocation.
+Expert-designed constructions and automated search balance reliability, qubit overhead, and hardware constraints~\cite{olle}. Inexpensive code-level screening can mis-rank circuit-level performance, while noisy simulation and decoding are costly~\cite{omniqec}. \textbf{How can costly evaluation feedback improve generation and screening to reduce the compute needed to find a suitable code?}
 
 \section*{Proposed Innovation: Adaptive Dual-Loop Discovery}
 We propose \textbf{AgentQEC}, a multi-agent framework coupling a \textbf{fast loop for candidate generation and screening} with a \textbf{slow loop for circuit-level evaluation}. Our focus is to use costly evaluation feedback both to guide subsequent code construction and to improve inexpensive candidate screening.
@@ -113,13 +113,13 @@ We propose \textbf{AgentQEC}, a multi-agent framework coupling a \textbf{fast lo
  
 % =============================== (b) ===============================
 \metricpent{9.35}{-0.2}%
-  {{Tokens per\\frontier code},{Cost-of-pass},{Simulation\\CPU-hours},{Time to\\target LER},{Throughput\\(cand./h)}}
-\node[panel] at (7.0,2.15) {(b)\ \ Agent efficiency};
+  {{Tokens per\\success},{Cost-of-pass},{Tool\\CPU/GPU-hours},{Time to\\target LER},{Success rate\\at fixed budget}}
+\node[panel] at (7.0,2.15) {(b)\ \ Agent metrics (schematic)};
  
 % =============================== (c) ===============================
 \metricpent{14.6}{-0.2}%
   {{Error suppression\\$-\log_{10}p_{\mathrm{LER}}$},{Scaling $\Gamma$},{Spacetime\\volume},{Decoder\\latency},{Encoding\\rate $k/N$}}
-\node[panel] at (12.25,2.15) {(c)\ \ QEC quality};
+\node[panel] at (12.25,2.15) {(c)\ \ QEC metrics (schematic)};
 \end{tikzpicture}\par\endgroup
 % \begin{tikzpicture}[
 %     font=\fontsize{9}{10.2}\selectfont,
@@ -141,23 +141,35 @@ We propose \textbf{AgentQEC}, a multi-agent framework coupling a \textbf{fast lo
 \vspace{1pt}
 
 \section*{Agentic System Efficiency and QEC Quality}
-\textbf{Agentic system efficiency} targets avoidable inference, inter-agent communication, and synchronization overhead. The controller selectively activates specialists and budgets their context exchange. Shared structured records reuse tool results only when candidate, noise, and decoder settings match; dependency-aware scheduling overlaps independent checks and reasoning. We will measure latency, GPU time, peak memory, tokens, communication volume, and tool time, including coordination overhead; training costs will be reported separately. \textbf{QEC system efficiency} is evaluated through logical-error rate at fixed noise and decoder settings, physical-qubit overhead, syndrome-extraction depth, and decoder latency. We will compare agent cost at matched QEC quality and QEC quality at matched budgets, rather than assume simultaneous gains in both.
+Following cost-aware agent evaluation~\cite{agentsmatter,costpass}, we adapt \textbf{cost-of-pass}: total LLM expenditure across all trials (including failures) divided by successful trials. Success requires a code meeting preset circuit-level LER and resource targets. Within each code family, we report \textbf{tokens per success, dollar cost per success, time to target, and success rate at fixed budgets}. Tokens cover all agent calls and retries, counting reported reasoning tokens once; dollar costs use model-specific prices. Tool CPU/GPU-hours and screening-update overhead are measured separately. Common hardware, noise, decoder, and validation protocols support comparisons at matched QEC quality and matched budgets.
+% Evaluation protocol: run independent search trials within each family/task stratum,
+% from the same initial screening model/memory; stop at first qualifying code or budget.
+% A qualifying code must pass a prespecified circuit-level statistical acceptance test.
+% Tokens-per-success = total tokens from ALL trials / number of successful trials.
+% It is not the mean token cost conditioned on success; failures still consume tokens.
+% Zero observed successes => no finite empirical cost-per-success (report with success rate).
+% Keep input/cached-input/output/reasoning accounting disjoint, with usage-API semantics
+% documented. Report input and generated counts separately; tokens are not FLOPs.
+% Report initial training/preparation cost separately, and include online updates in
+% tool/runtime totals. Do not add API billing and self-hosted compute for the same call.
 
 \section*{One-Year Scope and Evaluation}
 A dual-loop CSS-code discovery prototype, an adaptive screening module, and a reproducible quality–compute benchmark.
 
 % Compact, self-contained references: no BibTeX step or external .bib is needed.
-% These support background claims, not a claim of first-ever learned orchestration.
+% Cost-of-pass is an existing LM metric; the family-stratified QEC success protocol is
+% our task-specific adaptation. OmniQEC is the source for the existing fast/slow workflow.
 \begingroup
 \renewcommand{\section}[2]{}%
 \fontsize{8.1}{9.2}\selectfont
 \setlength{\parskip}{0pt}
-\begin{thebibliography}{4}
-\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}
-\bibitem{shor} P.~W.~Shor. \href{https://arxiv.org/abs/quant-ph/9508027}{Polynomial-Time Algorithms for Prime Factorization and Discrete Logarithms on a Quantum Computer}. \emph{SIAM J. Comput.} 26, 1484--1509 (1997).
-\bibitem{googleqec} Google Quantum AI and Collaborators. \href{https://doi.org/10.1038/s41586-024-08449-y}{Quantum error correction below the surface code threshold}. \emph{Nature} 638, 920--926 (2025).
-\bibitem{olle} J.~Olle et al. \href{https://arxiv.org/abs/2311.04750}{Simultaneous discovery of quantum error correction codes and encoders with a noise-aware reinforcement learning agent}. arXiv:2311.04750 (2023).
-\bibitem{corl} B.~Jin et al. \href{https://arxiv.org/abs/2511.02755}{Controlling Performance and Budget of a Centralized Multi-agent LLM System with Reinforcement Learning}. arXiv:2511.02755 (2025).
+\begin{thebibliography}{5}
+\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\parskip}{0pt}
+\bibitem{shor} P.~W.~Shor. \href{https://arxiv.org/abs/quant-ph/9508027}{Polynomial-Time Algorithms for Prime Factorization and Discrete Logarithms on a Quantum Computer}. \emph{SIAM J. Comput.} 26 (1997).
+\bibitem{olle} J.~Olle et al. \href{https://arxiv.org/abs/2311.04750}{Simultaneous Discovery of Quantum Error Correction Codes and Encoders with a Noise-Aware Reinforcement Learning Agent}. arXiv:2311.04750 (2023).
+\bibitem{omniqec} G.~Yan et al. \href{https://arxiv.org/abs/2607.25865}{OmniQEC: Discovering Practical Quantum Error-Correcting Codes by an AI Scientist}. arXiv:2607.25865 (2026).
+\bibitem{agentsmatter} S.~Kapoor et al. \href{https://arxiv.org/abs/2407.01502}{AI Agents That Matter}. arXiv:2407.01502 (2024).
+\bibitem{costpass} M.~H.~Erol et al. \href{https://arxiv.org/abs/2504.13359}{Cost-of-Pass: An Economic Framework for Evaluating Language Models}. arXiv:2504.13359 (2025).
 \end{thebibliography}
 \endgroup
 \end{document}
