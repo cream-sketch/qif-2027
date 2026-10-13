@@ -48,7 +48,7 @@ Shor's polynomial-time factoring algorithm illustrates quantum computing's advan
 Expert-designed constructions and automated search balance reliability, qubit overhead, and hardware constraints~\cite{olle}. Inexpensive code-level screening can mis-rank circuit-level performance, while noisy simulation and decoding are costly~\cite{omniqec}. \textbf{How can costly evaluation feedback improve generation and screening to reduce the compute needed to find a suitable code?}
 
 \section*{Proposed Innovation: Adaptive Dual-Loop Discovery}
-We propose \textbf{AgentQEC}, a multi-agent framework coupling a \textbf{fast loop for candidate generation and screening} with a \textbf{slow loop for circuit-level evaluation}. Our focus is to use costly evaluation feedback both to guide subsequent code construction and to improve inexpensive candidate screening.
+We propose \textbf{AgentQEC}, a multi-agent framework coupling a fast loop for candidate generation and screening with a slow loop for circuit-level evaluation. Our focus is to use costly evaluation feedback both to guide subsequent code construction and to improve inexpensive candidate screening.
 
 \textbf{Fast loop: generation and screening.} Designer and critic agents iteratively propose and refine code-construction programs. Executable tools check algebraic validity and resource constraints, extract inexpensive structural features, and return violations for repair. A lightweight learned screening model uses these features and the specified evaluation settings to predict circuit-level performance and uncertainty. A budget-aware allocator selects a subset of valid candidates for the slow loop, balancing predicted quality with exploration rather than relying solely on fixed code-level scores.
 
